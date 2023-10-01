@@ -2,52 +2,67 @@
 mod initiate_system {
     use dojo::world::Context;
     use traits::Into;
+    use connect4::components::ColumnPrintTrait;
     use starknet::ContractAddress;
     use connect4::components::{Slot, Game};
 
     fn execute(
         ctx: Context,
-        game_id: felt252,
         blue_id: ContractAddress,
         red_id: ContractAddress
     ) {
+                let game_id = pedersen::pedersen(blue_id.into(), red_id.into());
+
         // Initialize_game with a grid of r x c: 6 x 7 for a classic game
-        let mut board = array::ArrayTrait::<Span<Slot>>::new();
+        let mut col1 = array::ArrayTrait::<Slot>::new();
+        let mut col2 = array::ArrayTrait::<Slot>::new();
+        let mut col3 = array::ArrayTrait::<Slot>::new();
+        let mut col4 = array::ArrayTrait::<Slot>::new();
+        let mut col5 = array::ArrayTrait::<Slot>::new();
+        let mut col6 = array::ArrayTrait::<Slot>::new();
+        let mut col7 = array::ArrayTrait::<Slot>::new();
+
         let mut row = 0;
-        let mut col = 0;
 
         loop {
             if row == connect4::constants::ROWS {
                 break ();
             }
 
-            col = 0;
-            let mut boardRow = ArrayTrait::<Slot>::new();
-
-            loop {
-                if col == connect4::constants::COLS {
-                    break ();
-                }
-                boardRow.append(Slot::Empty);
-                col += 1;
-            };
-
-            board.append(boardRow.span());
+            col1.append(Slot::Empty);
+            col2.append(Slot::Empty);
+            col3.append(Slot::Empty);
+            col4.append(Slot::Empty);
+            col5.append(Slot::Empty);
+            col6.append(Slot::Empty);
+            col7.append(Slot::Empty);
             row += 1;
         };
+
+        'Got Here!'.print();
+        connect4::components::SlotPrintTrait::print(*col1.at(0));
+        //ColumnPrintTrait::print(col1);
 
         set !(
             ctx.world,
             (
                 Game {
-                    game_id : game_id.into(),
-                    winner: Option::None(()), 
+                    game_id : game_id,
+                    winner: Option::None, 
                     blue:  blue_id,
                     red: red_id,
-                    board: board
+                    col1: col1,
+                    col2: col2,
+                    col3: col3,
+                    col4: col4,
+                    col5: col5,
+                    col6: col6,
+                    col7: col7
                 }
             )
-        )        
+        );
+
+        'Got Here 2'.print();        
     }
 }
 
@@ -55,13 +70,14 @@ mod initiate_system {
 mod tests {
     use starknet::ContractAddress;
     use dojo::test_utils::spawn_test_world;
-    use connect4::components::{Game, game};
+    use connect4::components::{Game, game, Slot};
     use connect4::systems::initiate_system;
     use array::ArrayTrait;
     use core::traits::Into;
     use dojo::world::IWorldDispatcherTrait;
     use core::array::SpanTrait;
-   // use dojo::StorageSize
+    use debug::PrintTrait;
+    use connect4::components::SlotPartialEq;
 
     #[test]
     #[available_gas(3000000000000000)]
@@ -80,15 +96,41 @@ mod tests {
         let world = spawn_test_world(components, systems);
 
         let mut calldata = array::ArrayTrait::<core::felt252>::new();
-        calldata.append('gameid'.into());
         calldata.append(blue.into());
         calldata.append(red.into());
 
         world.execute('initiate_system'.into(), calldata);
 
-        let game = world
-            .entity('Game'.into(), 'gameid'.into(), 0_u8, dojo::StorageSize::<Game>::packed_size());
+        'Test got here'.print();
+        let game_id = pedersen::pedersen(blue.into(), red.into());
 
-        assert(game::board::len() == 6, 'board rows not correct');
+        let game = get!(world, (game_id), (Game));
+
+        'Test got here 2'.print();
+        assert(game.blue == blue, 'blue address is incorrect');
+        assert(game.red == red, 'red address is incorrect');
+        assert(game.col1.len() == 6, 'col1 is not correct' );
+       let mut row = 0;
+       let EmptySlot = connect4::components::Slot::Empty;
+       
+
+
+
+        loop {
+            if row == connect4::constants::ROWS {
+                break ();
+            }
+
+            assert(SlotPartialEq::eq(game.col1.at(row), @EmptySlot), 'Slot is not Empty');
+            assert(SlotPartialEq::eq(game.col2.at(row), @EmptySlot), 'Slot is not Empty');
+            assert(SlotPartialEq::eq(game.col3.at(row), @EmptySlot), 'Slot is not Empty');
+            assert(SlotPartialEq::eq(game.col4.at(row), @EmptySlot), 'Slot is not Empty');
+            assert(SlotPartialEq::eq(game.col5.at(row), @EmptySlot), 'Slot is not Empty');
+            assert(SlotPartialEq::eq(game.col6.at(row), @EmptySlot), 'Slot is not Empty');
+            assert(SlotPartialEq::eq(game.col7.at(row), @EmptySlot), 'Slot is not Empty');
+
+            row += 1;
+        };
+
     }
 }

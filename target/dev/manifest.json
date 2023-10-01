@@ -619,10 +619,6 @@
           "type": "@connect4::systems::initiate::initiate_system::ContractState"
         },
         {
-          "name": "game_id",
-          "type": "core::felt252"
-        },
-        {
           "name": "blue_id",
           "type": "core::starknet::contract_address::ContractAddress"
         },
@@ -632,7 +628,7 @@
         }
       ],
       "outputs": [],
-      "class_hash": "0x6a95216d4b0f0e46c2b6ca80095981029c1fa79d14a9323305c59ef4a4750a2",
+      "class_hash": "0x165a972a4ec47f28f2dc63dd9c0baa5981c9988c60420f385b544dea85570e9",
       "dependencies": [],
       "abi": [
         {
@@ -682,10 +678,6 @@
           "type": "function",
           "name": "execute",
           "inputs": [
-            {
-              "name": "game_id",
-              "type": "core::felt252"
-            },
             {
               "name": "blue_id",
               "type": "core::starknet::contract_address::ContractAddress"
@@ -854,12 +846,42 @@
           "key": false
         },
         {
-          "name": "board",
-          "type": "Array<Span<Slot>>",
+          "name": "col1",
+          "type": "Array<Slot>",
+          "key": false
+        },
+        {
+          "name": "col2",
+          "type": "Array<Slot>",
+          "key": false
+        },
+        {
+          "name": "col3",
+          "type": "Array<Slot>",
+          "key": false
+        },
+        {
+          "name": "col4",
+          "type": "Array<Slot>",
+          "key": false
+        },
+        {
+          "name": "col5",
+          "type": "Array<Slot>",
+          "key": false
+        },
+        {
+          "name": "col6",
+          "type": "Array<Slot>",
+          "key": false
+        },
+        {
+          "name": "col7",
+          "type": "Array<Slot>",
           "key": false
         }
       ],
-      "class_hash": "0x3e5b65f1f7ef6493d0b53fedb8582e548288e924517a6752acc4d31c4a260f9",
+      "class_hash": "0x5724423cf5b5f78c4fdab6b1f4a2c781633b7977aa3cafe4ef6d4e35d3f6f58",
       "abi": [
         {
           "type": "function",
